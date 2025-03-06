@@ -1,0 +1,62 @@
+import React, { useState } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, LayersControl } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import './App.css';
+
+const { BaseLayer } = LayersControl;
+
+function App() {
+  const [assets, setAssets] = useState([
+    { id: 1, name: "Council Building 1", lat: 53.793, lng: -1.752, type: "core" },
+    { id: 2, name: "Park A", lat: 53.800, lng: -1.760, type: "additional" },
+  ]);
+  const [user, setUser] = useState(null);
+
+  // Simulate login
+  const handleLogin = () => {
+    setUser({ name: "Test User", role: "Editor" });
+  };
+
+  // Simulate CSV upload
+  const handleFileUpload = (event) => {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const text = e.target.result;
+      const newAssets = text.split('\n').slice(1).map((line, index) => {
+        const [name, lat, lng] = line.split(',');
+        return { id: assets.length + index + 1, name, lat: parseFloat(lat), lng: parseFloat(lng), type: "core" };
+      });
+      setAssets([...assets, ...newAssets]);
+    };
+    reader.readAsText(file);
+  };
+
+  return (
+    <div className="App">
+      <h1>Bradford Asset Mapping</h1>
+      {!user ? (
+        <button onClick={handleLogin}>Login</button>
+      ) : (
+        <>
+          <p>Welcome, {user.name} ({user.role})</p>
+          <input type="file" accept=".csv" onChange={handleFileUpload} />
+          <MapContainer center={[53.793, -1.752]} zoom={13} style={{ height: "500px", width: "100%" }}>
+            <LayersControl position="topright">
+              <BaseLayer checked name="OpenStreetMap">
+                <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+              </BaseLayer>
+            </LayersControl>
+            {assets.map(asset => (
+              <Marker key={asset.id} position={[asset.lat, asset.lng]}>
+                <Popup>{asset.name} ({asset.type})</Popup>
+              </Marker>
+            ))}
+          </MapContainer>
+        </>
+      )}
+    </div>
+  );
+}
+
+export default App;
