@@ -1,0 +1,23 @@
+CREATE DATABASE bradford_assets;
+USE bradford_assets;
+
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    address TEXT,
+    department VARCHAR(100),
+    role ENUM('Admin', 'Editor', 'Viewer') DEFAULT 'Viewer',
+    approved BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE assets (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    latitude DECIMAL(10, 6) NOT NULL,
+    longitude DECIMAL(10, 6) NOT NULL,
+    type ENUM('core', 'additional') DEFAULT 'core',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
