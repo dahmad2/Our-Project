@@ -1,0 +1,27 @@
+namespace Tests\Feature;
+
+use Tests\TestCase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+class DataUploadControllerTest extends TestCase
+{
+    use RefreshDatabase;
+
+    /** @test */
+    public function csv_upload_processes_correctly()
+    {
+        Storage::fake('local');
+        $admin = User::factory()->create(['role' => 'admin']);
+
+        $file = UploadedFile::fake()->createWithContent('postcodes.csv', "postcode,latitude,longitude\nBD1,53.7958,-1.759");
+        
+        $response = $this->actingAs($admin)->post('/admin/upload', [
+            'csv_file' => $file,
+        ]);
+
+        $response->assertRedirect('/admin/upload');
+        // Additional assertions to verify database entries can be added here
+    }
+}
