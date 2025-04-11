@@ -1,0 +1,22 @@
+namespace Tests\Feature;
+
+use Tests\TestCase;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+class AdminControllerTest extends TestCase
+{
+    use RefreshDatabase;
+
+    /** @test */
+    public function admin_can_approve_a_user()
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $user = User::factory()->create(['approved' => false]);
+
+        $response = $this->actingAs($admin)->post("/admin/approve/{$user->id}");
+
+        $response->assertRedirect('/admin/dashboard');
+        $this->assertTrue($user->fresh()->approved);
+    }
+}
