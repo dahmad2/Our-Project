@@ -25,20 +25,10 @@ class AuthenticatedSessionController extends Controller
     public function store(LoginRequest $request): RedirectResponse
     {
         $request->authenticate();
+
         $request->session()->regenerate();
 
-        $user = Auth::user();
-
-        if (!$user->is_approved) {
-            Auth::logout();
-            return redirect()->back()->withErrors(['email' => 'Your account is pending approval.']);
-        }
-
-        if ($user->role === 'admin') {
-            return redirect('/admin');
-        }
-
-        return redirect('/dashboard');
+        return redirect()->intended(route('dashboard', absolute: false));
     }
 
     /**
@@ -49,6 +39,7 @@ class AuthenticatedSessionController extends Controller
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();
+
         $request->session()->regenerateToken();
 
         return redirect('/');
